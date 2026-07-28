@@ -14,6 +14,7 @@ interface CartState {
   addItem: (product: Product, color: string, size: string) => void;
   removeItem: (index: number) => void;
   setQuantity: (index: number, quantity: number) => void;
+  clearCart: () => void;
   open: () => void;
   close: () => void;
   toggle: () => void;
@@ -52,6 +53,8 @@ export const useCartStore = create<CartState>((set, get) => ({
         i === index ? { ...item, quantity: Math.max(1, quantity) } : item,
       ),
     })),
+
+  clearCart: () => set({ items: [] }),
 
   open: () => set({ isOpen: true }),
   close: () => set({ isOpen: false }),

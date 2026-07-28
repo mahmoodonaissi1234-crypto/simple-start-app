@@ -12,4 +12,9 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  // This container doesn't support IPv6, so override the shared config's
+  // default "::" host (which fails with EAFNOSUPPORT here).
+  vite: {
+    server: { host: "0.0.0.0" },
+  },
 });

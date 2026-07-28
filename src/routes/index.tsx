@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
@@ -60,6 +60,12 @@ function AuthPage() {
               <SignupForm />
             </TabsContent>
           </Tabs>
+          <Link
+            to="/store"
+            className="mt-4 block text-center text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+          >
+            Browse the virtual showroom →
+          </Link>
         </CardContent>
       </Card>
     </div>

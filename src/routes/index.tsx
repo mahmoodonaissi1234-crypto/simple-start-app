@@ -146,7 +146,11 @@ function LandingPage() {
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.5, delay: reducedMotion ? 0 : i * 0.08 }}
             >
-              <Link to="/shop" className="group block">
+              <Link
+                to="/shop/$productId"
+                params={{ productId: product.id }}
+                className="group block"
+              >
                 <div
                   className="mb-4 aspect-[3/4] rounded-lg transition-transform duration-300 group-hover:scale-[1.02]"
                   style={{

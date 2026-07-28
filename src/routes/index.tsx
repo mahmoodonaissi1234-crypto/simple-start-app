@@ -1,220 +1,227 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { z } from "zod";
-import { supabase } from "@/integrations/supabase/client";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
+import { Scissors, Leaf, Ruler, ShieldCheck } from "lucide-react";
+import { Navbar } from "@/components/site/Navbar";
+import { HeroSuitModel } from "@/components/site/HeroSuitModel";
+import { CartDrawer } from "@/components/cart/CartDrawer";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { PRODUCTS } from "@/data/products";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Sign in — Starter" },
-      { name: "description", content: "Sign in or create an account to get started." },
-      { property: "og:title", content: "Sign in — Starter" },
-      { property: "og:description", content: "Sign in or create an account to get started." },
+      { title: "The Suit Room — Premium Men's Suits" },
+      { name: "description", content: "A luxury digital showroom for premium tailored suits." },
     ],
   }),
-  component: AuthPage,
+  component: LandingPage,
 });
 
-const emailSchema = z.string().trim().email("Enter a valid email").max(255);
-const passwordSchema = z.string().min(6, "Password must be at least 6 characters").max(72);
+const headlineWords = ["Tailored.", "Timeless.", "Yours."];
 
-function AuthPage() {
-  const navigate = useNavigate();
+const VALUE_PROPS = [
+  {
+    icon: Scissors,
+    title: "Hand-finished tailoring",
+    body: "Every jacket is finished by hand, from the lapel roll to the buttonholes.",
+  },
+  {
+    icon: Ruler,
+    title: "Fit guarantee",
+    body: "Free alterations within 30 days if the fit isn't exactly right.",
+  },
+  {
+    icon: Leaf,
+    title: "Responsibly sourced",
+    body: "Wool and linen sourced from mills committed to sustainable practice.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Lifetime care",
+    body: "Complimentary pressing and minor repairs for as long as you own the suit.",
+  },
+];
 
-  useEffect(() => {
-    // If already signed in, route to plan or dashboard.
-    (async () => {
-      const { data } = await supabase.auth.getSession();
-      if (!data.session) return;
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("plan")
-        .eq("id", data.session.user.id)
-        .maybeSingle();
-      navigate({ to: profile?.plan ? "/dashboard" : "/plan", replace: true });
-    })();
-  }, [navigate]);
+function LandingPage() {
+  const reducedMotion = useReducedMotion();
+  const craftRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: craftRef,
+    offset: ["start end", "end start"],
+  });
+  const parallaxY = useTransform(scrollYProgress, [0, 1], reducedMotion ? [0, 0] : [-40, 40]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Welcome</CardTitle>
-          <CardDescription>Sign in or create an account to continue.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="login">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Log in</TabsTrigger>
-              <TabsTrigger value="signup">Sign up</TabsTrigger>
-            </TabsList>
-            <TabsContent value="login">
-              <LoginForm />
-            </TabsContent>
-            <TabsContent value="signup">
-              <SignupForm />
-            </TabsContent>
-          </Tabs>
-          <Link
-            to="/store"
-            className="mt-4 block text-center text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-          >
-            Browse the virtual showroom →
+    <div className="bg-brand-charcoal font-sans text-brand-cream">
+      <Navbar />
+      <CartDrawer />
+
+      {/* Hero */}
+      <section className="relative flex min-h-screen items-center overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-brand-charcoal via-brand-navy/40 to-brand-charcoal" />
+        <div className="absolute inset-y-0 right-0 w-full md:w-1/2">
+          <HeroSuitModel />
+        </div>
+
+        <div className="relative z-10 mx-auto w-full max-w-7xl px-6">
+          <div className="max-w-xl">
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="mb-4 text-sm uppercase tracking-[0.3em] text-brand-gold"
+            >
+              The Suit Room
+            </motion.p>
+            <h1 className="font-serif text-5xl leading-tight md:text-7xl">
+              {headlineWords.map((word, i) => (
+                <motion.span
+                  key={word}
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7, delay: reducedMotion ? 0 : i * 0.15 }}
+                  className="mr-4 inline-block"
+                >
+                  {word}
+                </motion.span>
+              ))}
+            </h1>
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: reducedMotion ? 0 : 0.55 }}
+              className="mt-6 max-w-md text-lg text-brand-cream/70"
+            >
+              Premium, made-to-measure suits for the moments that matter — cut in small batches,
+              finished by hand.
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: reducedMotion ? 0 : 0.7 }}
+              className="mt-8 flex gap-4"
+            >
+              <Button
+                asChild
+                size="lg"
+                className="bg-brand-gold text-brand-charcoal hover:bg-brand-gold/90"
+              >
+                <Link to="/shop">Shop the collection</Link>
+              </Button>
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="border-brand-cream/30 bg-transparent text-brand-cream hover:bg-brand-cream/10"
+              >
+                <a href="#craftsmanship">Our craftsmanship</a>
+              </Button>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Collection */}
+      <motion.section
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.7 }}
+        className="mx-auto max-w-7xl px-6 py-28"
+      >
+        <div className="mb-12 flex items-end justify-between">
+          <h2 className="font-serif text-3xl md:text-4xl">Featured Collection</h2>
+          <Link to="/shop" className="text-sm text-brand-gold hover:underline">
+            View all →
           </Link>
-        </CardContent>
-      </Card>
+        </div>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {PRODUCTS.slice(0, 4).map((product, i) => (
+            <motion.div
+              key={product.id}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.5, delay: reducedMotion ? 0 : i * 0.08 }}
+            >
+              <Link to="/shop" className="group block">
+                <div
+                  className="mb-4 aspect-[3/4] rounded-lg transition-transform duration-300 group-hover:scale-[1.02]"
+                  style={{
+                    background: `linear-gradient(160deg, ${product.colorOptions[0].hex}, #0b0b10)`,
+                  }}
+                />
+                <p className="font-serif text-lg">{product.name}</p>
+                <p className="text-sm text-brand-cream/50">${product.price}</p>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+      </motion.section>
+
+      {/* Why Choose Us */}
+      <section className="border-y border-white/5 bg-black/20 py-28">
+        <div className="mx-auto max-w-7xl px-6">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="mb-14 text-center font-serif text-3xl md:text-4xl"
+          >
+            Why Choose Us
+          </motion.h2>
+          <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
+            {VALUE_PROPS.map((prop, i) => (
+              <motion.div
+                key={prop.title}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.5, delay: reducedMotion ? 0 : i * 0.1 }}
+                className="text-center"
+              >
+                <prop.icon className="mx-auto mb-4 size-8 text-brand-gold" />
+                <h3 className="mb-2 font-serif text-lg">{prop.title}</h3>
+                <p className="text-sm text-brand-cream/60">{prop.body}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Craftsmanship */}
+      <section id="craftsmanship" ref={craftRef} className="overflow-hidden py-28">
+        <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 px-6 md:grid-cols-2">
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.7 }}
+          >
+            <p className="mb-3 text-sm uppercase tracking-[0.3em] text-brand-gold">Craftsmanship</p>
+            <h2 className="mb-6 font-serif text-3xl md:text-4xl">Built by hand, fitted to you</h2>
+            <p className="max-w-md text-brand-cream/70">
+              Every suit passes through the hands of a single tailor from cut to finish — over 80
+              individual steps, half-canvassed by hand, pressed three times before it ever reaches
+              you.
+            </p>
+          </motion.div>
+          <motion.div
+            style={{ y: parallaxY }}
+            className="relative aspect-square overflow-hidden rounded-xl"
+          >
+            <div className="absolute inset-0 bg-gradient-to-tr from-brand-navy via-brand-charcoal to-black" />
+            <div className="absolute inset-0 opacity-20 [background-image:repeating-linear-gradient(45deg,theme(colors.brand-gold)_0,theme(colors.brand-gold)_1px,transparent_1px,transparent_12px)]" />
+          </motion.div>
+        </div>
+      </section>
+
+      <footer className="border-t border-white/5 px-6 py-10 text-center text-sm text-brand-cream/40">
+        © {new Date().getFullYear()} The Suit Room. All rights reserved.
+      </footer>
     </div>
-  );
-}
-
-function LoginForm() {
-  const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-
-    const emailResult = emailSchema.safeParse(email);
-    if (!emailResult.success) return setError(emailResult.error.issues[0].message);
-    const passwordResult = passwordSchema.safeParse(password);
-    if (!passwordResult.success) return setError(passwordResult.error.issues[0].message);
-
-    setLoading(true);
-    const { data, error: signInError } = await supabase.auth.signInWithPassword({
-      email: emailResult.data,
-      password: passwordResult.data,
-    });
-    setLoading(false);
-
-    if (signInError) {
-      setError(
-        signInError.message.toLowerCase().includes("invalid")
-          ? "Invalid email or password."
-          : signInError.message,
-      );
-      return;
-    }
-
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("plan")
-      .eq("id", data.user!.id)
-      .maybeSingle();
-    navigate({ to: profile?.plan ? "/dashboard" : "/plan", replace: true });
-  }
-
-  return (
-    <form onSubmit={onSubmit} className="mt-4 space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="login-email">Email</Label>
-        <Input
-          id="login-email"
-          type="email"
-          autoComplete="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="login-password">Password</Label>
-        <Input
-          id="login-password"
-          type="password"
-          autoComplete="current-password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-      </div>
-      {error && <p className="text-sm text-destructive">{error}</p>}
-      <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? "Signing in…" : "Log in"}
-      </Button>
-    </form>
-  );
-}
-
-function SignupForm() {
-  const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-
-    const emailResult = emailSchema.safeParse(email);
-    if (!emailResult.success) return setError(emailResult.error.issues[0].message);
-    const passwordResult = passwordSchema.safeParse(password);
-    if (!passwordResult.success) return setError(passwordResult.error.issues[0].message);
-
-    setLoading(true);
-    const { data, error: signUpError } = await supabase.auth.signUp({
-      email: emailResult.data,
-      password: passwordResult.data,
-      options: { emailRedirectTo: `${window.location.origin}/` },
-    });
-    setLoading(false);
-
-    if (signUpError) {
-      const msg = signUpError.message.toLowerCase();
-      if (msg.includes("registered") || msg.includes("already")) {
-        setError("An account with that email already exists.");
-      } else {
-        setError(signUpError.message);
-      }
-      return;
-    }
-
-    if (!data.session) {
-      setError("Check your email to confirm your account, then log in.");
-      return;
-    }
-
-    navigate({ to: "/plan", replace: true });
-  }
-
-  return (
-    <form onSubmit={onSubmit} className="mt-4 space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="signup-email">Email</Label>
-        <Input
-          id="signup-email"
-          type="email"
-          autoComplete="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="signup-password">Password</Label>
-        <Input
-          id="signup-password"
-          type="password"
-          autoComplete="new-password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <p className="text-xs text-muted-foreground">At least 6 characters.</p>
-      </div>
-      {error && <p className="text-sm text-destructive">{error}</p>}
-      <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? "Creating account…" : "Sign up"}
-      </Button>
-    </form>
   );
 }

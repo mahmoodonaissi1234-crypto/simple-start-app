@@ -11,7 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
-import { Route as StoreRouteImport } from './routes/store'
+import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ShopRouteImport } from './routes/shop'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedPlanRouteImport } from './routes/_authenticated/plan'
 
@@ -24,9 +26,19 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const StoreRoute = StoreRouteImport.update({
-  id: '/store',
-  path: '/store',
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopRoute = ShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
@@ -42,13 +54,17 @@ const AuthenticatedPlanRoute = AuthenticatedPlanRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/store': typeof StoreRoute
+  '/checkout': typeof CheckoutRoute
+  '/login': typeof LoginRoute
+  '/shop': typeof ShopRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/plan': typeof AuthenticatedPlanRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/store': typeof StoreRoute
+  '/checkout': typeof CheckoutRoute
+  '/login': typeof LoginRoute
+  '/shop': typeof ShopRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/plan': typeof AuthenticatedPlanRoute
 }
@@ -56,20 +72,24 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/store': typeof StoreRoute
+  '/checkout': typeof CheckoutRoute
+  '/login': typeof LoginRoute
+  '/shop': typeof ShopRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/plan': typeof AuthenticatedPlanRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/store' | '/dashboard' | '/plan'
+  fullPaths: '/' | '/checkout' | '/login' | '/shop' | '/dashboard' | '/plan'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/store' | '/dashboard' | '/plan'
+  to: '/' | '/checkout' | '/login' | '/shop' | '/dashboard' | '/plan'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
-    | '/store'
+    | '/checkout'
+    | '/login'
+    | '/shop'
     | '/_authenticated/dashboard'
     | '/_authenticated/plan'
   fileRoutesById: FileRoutesById
@@ -77,7 +97,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  StoreRoute: typeof StoreRoute
+  CheckoutRoute: typeof CheckoutRoute
+  LoginRoute: typeof LoginRoute
+  ShopRoute: typeof ShopRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -96,11 +118,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/store': {
-      id: '/store'
-      path: '/store'
-      fullPath: '/store'
-      preLoaderRoute: typeof StoreRouteImport
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shop': {
+      id: '/shop'
+      path: '/shop'
+      fullPath: '/shop'
+      preLoaderRoute: typeof ShopRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard': {
@@ -136,7 +172,9 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  StoreRoute: StoreRoute,
+  CheckoutRoute: CheckoutRoute,
+  LoginRoute: LoginRoute,
+  ShopRoute: ShopRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
